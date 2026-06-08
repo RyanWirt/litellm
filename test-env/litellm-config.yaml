@@ -1,0 +1,16 @@
+model_list:
+  - model_name: llama3.2
+    litellm_params:
+      model: ollama/llama3.2:1b
+      api_base: http://ollama:11434
+
+  - model_name: llama3.2:1b
+    litellm_params:
+      model: ollama/llama3.2:1b
+      api_base: http://ollama:11434
+
+litellm_settings:
+  drop_params: True
+
+general_settings:
+  master_key: sk-test-1234
