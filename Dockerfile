@@ -1,20 +1,11 @@
 # Base image for building
-ARG LITELLM_BUILD_IMAGE=registry.access.redhat.com/ubi9/ubi:9.5
-
-# Runtime image
-ARG LITELLM_RUNTIME_IMAGE=registry.access.redhat.com/ubi9/ubi:9.5
-ARG UV_IMAGE=ghcr.io/astral-sh/uv:0.11.7@sha256:240fb85ab0f263ef12f492d8476aa3a2e4e1e333f7d67fbdd923d00a506a516a
-
-FROM $UV_IMAGE AS uvbin
+ARG LITELLM_BUILD_IMAGE=registry1.dso.mil/ironbank/redhat/ubi/ubi9:9.8
 
 # Builder stage
 FROM $LITELLM_BUILD_IMAGE AS builder
 
 WORKDIR /app
 USER root
-
-COPY --from=uvbin /uv /usr/local/bin/uv
-COPY --from=uvbin /uvx /usr/local/bin/uvx
 
 RUN dnf module enable nodejs:20 -y && \
     dnf install -y --nodocs \
@@ -28,6 +19,9 @@ RUN dnf module enable nodejs:20 -y && \
         npm \
         libsndfile && \
     dnf clean all
+
+RUN python3.12 -m ensurepip --upgrade && \
+    pip3.12 install uv==0.11.7
 
 ENV UV_PROJECT_ENVIRONMENT=/app/.venv \
     UV_LINK_MODE=copy \
@@ -66,7 +60,7 @@ RUN sed -i 's/\r$//' docker/entrypoint.sh && chmod +x docker/entrypoint.sh && \
     sed -i 's/\r$//' docker/prod_entrypoint.sh && chmod +x docker/prod_entrypoint.sh
 
 # Runtime stage
-FROM $LITELLM_RUNTIME_IMAGE AS runtime
+FROM $LITELLM_BUILD_IMAGE AS runtime
 
 USER root
 
