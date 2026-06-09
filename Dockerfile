@@ -1,8 +1,5 @@
 # Base image for building
-ARG LITELLM_BUILD_IMAGE=registry.access.redhat.com/ubi9/ubi:9.5
-
-# Runtime image
-ARG LITELLM_RUNTIME_IMAGE=registry.access.redhat.com/ubi9/ubi:9.5
+ARG LITELLM_BUILD_IMAGE=registry1.dso.mil/ironbank/redhat/ubi/ubi9:9.8
 
 # Builder stage
 FROM $LITELLM_BUILD_IMAGE AS builder
@@ -63,7 +60,7 @@ RUN sed -i 's/\r$//' docker/entrypoint.sh && chmod +x docker/entrypoint.sh && \
     sed -i 's/\r$//' docker/prod_entrypoint.sh && chmod +x docker/prod_entrypoint.sh
 
 # Runtime stage
-FROM $LITELLM_RUNTIME_IMAGE AS runtime
+FROM $LITELLM_BUILD_IMAGE AS runtime
 
 USER root
 

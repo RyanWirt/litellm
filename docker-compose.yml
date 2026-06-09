@@ -112,10 +112,12 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--storage.tsdb.retention.time=15d"
+    environment:
+      LITELLM_MASTER_KEY: "${LITELLM_MASTER_KEY}"
+    entrypoint:
+      - /bin/sh
+      - -c
+      - 'printf "%s" "$LITELLM_MASTER_KEY" > /tmp/litellm_key && /bin/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=15d'
     restart: always
 
 volumes:
